@@ -1,9 +1,6 @@
 package com.packt.car_database_be.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Car {
@@ -15,7 +12,7 @@ public class Car {
 
     public Car() {};
 
-    public Car(String brand, String model, String colour, String registrationNumber, int modelYear, int price) {
+    public Car(String brand, String model, String colour, String registrationNumber, int modelYear, int price, Owner owner) {
         super();
         this.brand = brand;
         this.model = model;
@@ -23,6 +20,19 @@ public class Car {
         this.registrationNumber = registrationNumber;
         this.modelYear = modelYear;
         this.price = price;
+        this.owner = owner;
+    }
+
+    @ManyToOne(fetch=FetchType.LAZY)
+    @JoinColumn(name="owner")
+    private Owner owner; // Foreign key.
+
+    public Owner getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Owner owner) {
+        this.owner = owner;
     }
 
     public long getId() {

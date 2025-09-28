@@ -1,6 +1,5 @@
 package com.packt.car_database_be.domain;
 
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
