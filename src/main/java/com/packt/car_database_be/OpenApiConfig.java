@@ -10,6 +10,10 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI carDatabaseBeOpenAPI() {
-        return new OpenAPI().info(new Info().title("Car REST API").description("Car Database").version("1.0"));
+        return new OpenAPI()
+                .info(new Info()
+                        .title("Car REST API")
+                        .description("Car Database")
+                        .version("1.0"));
     }
 }
