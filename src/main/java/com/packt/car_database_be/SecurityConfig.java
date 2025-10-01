@@ -12,10 +12,10 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
     @Bean
     public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
-        UserDetails user = User
-                .builder()
+        UserDetails user = User.builder()
                 .username("user")
                 .password(passwordEncoder().encode("password"))
                 .roles("USER")
@@ -26,7 +26,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-
         return new BCryptPasswordEncoder();
     }
 }

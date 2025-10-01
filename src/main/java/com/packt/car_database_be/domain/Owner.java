@@ -9,6 +9,7 @@ import java.util.List;
 @Entity
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Owner {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id; // Primary key.

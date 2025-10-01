@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 @Entity
 public class Car {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id; // Primary key.
