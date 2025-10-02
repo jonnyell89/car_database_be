@@ -1,9 +1,6 @@
 package com.packt.car_database_be;
 
-import com.packt.car_database_be.domain.Car;
-import com.packt.car_database_be.domain.CarRepository;
-import com.packt.car_database_be.domain.Owner;
-import com.packt.car_database_be.domain.OwnerRepository;
+import com.packt.car_database_be.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -21,10 +18,12 @@ public class CarDatabaseBeApplication implements CommandLineRunner {
 
 	private final CarRepository carRepository; // Dependency injection.
 	private final OwnerRepository ownerRepository; // Dependency injection.
+	private final UserRepository userRepository;
 
-	public CarDatabaseBeApplication(OwnerRepository ownerRepository, CarRepository carRepository) {
+	public CarDatabaseBeApplication(OwnerRepository ownerRepository, CarRepository carRepository, UserRepository userRepository) {
 		this.ownerRepository = ownerRepository;
 		this.carRepository = carRepository;
+		this.userRepository = userRepository;
 	}
 
 	public static void main(String[] args) {
@@ -45,5 +44,11 @@ public class CarDatabaseBeApplication implements CommandLineRunner {
 		for (Car car : carRepository.findAll()) {
 			logger.info("brand: {}, model: {}", car.getBrand(), car.getModel());
 		}
+
+		// Username: admin, password: admin
+		userRepository.save(new User("admin", "$2a$12$Y5zNvfgv3s5Maw3HMIRDK.HzBgu6r15v0N5NWoB3s9xD08iOFQPA2", "ADMIN"));
+
+		// Username: user, password: user
+		userRepository.save(new User("user", "$2a$12$3euH0ZIyCuQAUx.872c.I.P5x8RcMm2iMwHxz3W5ZK9JNR7TEdGi2", "USER"));
 	}
 }

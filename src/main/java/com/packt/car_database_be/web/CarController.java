@@ -43,6 +43,9 @@ public class CarController {
                     car.setModel(updatedCar.getModel());
                     car.setColour(updatedCar.getColour());
                     car.setRegistrationNumber(updatedCar.getRegistrationNumber());
+                    car.setModelYear(updatedCar.getModelYear());
+                    car.setPrice(updatedCar.getPrice());
+                    car.setOwner(updatedCar.getOwner());
                     return ResponseEntity.ok(carRepository.save(car));
                 })
                 .orElse(ResponseEntity.notFound().build());
@@ -56,6 +59,9 @@ public class CarController {
                     if (partialCar.getModel() != null) car.setModel(partialCar.getModel());
                     if (partialCar.getColour() != null) car.setColour(partialCar.getColour());
                     if (partialCar.getRegistrationNumber() != null) car.setRegistrationNumber(partialCar.getRegistrationNumber());
+                    if (partialCar.getModelYear() != null) car.setModelYear(partialCar.getModelYear());
+                    if (partialCar.getPrice() != null) car.setPrice(partialCar.getPrice());
+                    if (partialCar.getOwner() != null) car.setOwner(partialCar.getOwner());
                     return ResponseEntity.ok(carRepository.save(car));
                 })
                 .orElse(ResponseEntity.notFound().build());

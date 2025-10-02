@@ -9,11 +9,11 @@ public class Car {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id; // Primary key.
     private String brand, model, colour, registrationNumber; // Columns in database.
-    private int modelYear, price; // Columns in database.
+    private Integer modelYear, price; // Columns in database.
 
     public Car() {};
 
-    public Car(String brand, String model, String colour, String registrationNumber, int modelYear, int price, Owner owner) {
+    public Car(String brand, String model, String colour, String registrationNumber, Integer modelYear, Integer price, Owner owner) {
         super();
         this.brand = brand;
         this.model = model;
@@ -76,19 +76,19 @@ public class Car {
         this.registrationNumber = registrationNumber;
     }
 
-    public int getModelYear() {
+    public Integer getModelYear() {
         return modelYear;
     }
 
-    public void setModelYear(int modelYear) {
+    public void setModelYear(Integer modelYear) {
         this.modelYear = modelYear;
     }
 
-    public int getPrice() {
+    public Integer getPrice() {
         return price;
     }
 
-    public void setPrice(int price) {
+    public void setPrice(Integer price) {
         this.price = price;
     }
 
