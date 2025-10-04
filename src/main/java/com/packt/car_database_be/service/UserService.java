@@ -31,7 +31,7 @@ public class UserService implements UserDetailsService {
             builder.password(currentUser.getPassword());
             builder.roles(currentUser.getRole());
         } else {
-            throw new UsernameNotFoundException("User not found.");
+            throw new UsernameNotFoundException("User not found in userRepository.");
         }
 
         return builder.build();

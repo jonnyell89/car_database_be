@@ -29,17 +29,26 @@ public class JwtService {
     }
 
     // Get JSON Web Token from request Authorization header, verify, get username.
-    public String getAuthorisedUser(HttpServletRequest httpServletRequest) {
-        String token = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
+//    public String getAuthorisedUser(HttpServletRequest httpServletRequest) {
+//        String token = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
+//
+//        if (token != null) {
+//            return Jwts.parserBuilder()
+//                    .setSigningKey(key)
+//                    .build()
+//                    .parseClaimsJws(token.replace(PREFIX, ""))
+//                    .getBody()
+//                    .getSubject();
+//        }
+//        return null;
+//    }
 
-        if (token != null) {
-            return Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token.replace(PREFIX, ""))
-                    .getBody()
-                    .getSubject();
-        }
-        return null;
+    public String getAuthorisedUser(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 }

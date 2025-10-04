@@ -12,6 +12,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import java.util.Collections;
+
 @Component
 public class AuthenticationFilter extends OncePerRequestFilter {
 
@@ -22,18 +24,29 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, java.io.IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, java.io.IOException {
         // Get JSON Web Token from Authorization header.
-        String jws = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
+        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if (jws != null) {
-            // Verify JSON Web Token and get user.
-            String user = jwtService.getAuthorisedUser(httpServletRequest);
-            // Authenticate
-            Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, java.util.Collections.emptyList());
+        if (header != null && header.startsWith("Bearer ")) {
+            String token = header.substring(7);
+            String user = jwtService.getAuthorisedUser(token);
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (user != null) {
+                Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
         }
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
+        filterChain.doFilter(request, response);
+
+//        if (jwt != null) {
+//            // Verify JSON Web Token and get user.
+//            String user = jwtService.getAuthorisedUser(request);
+//            // Authenticate
+//            Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, java.util.Collections.emptyList());
+//
+//            SecurityContextHolder.getContext().setAuthentication(authentication);
+//        }
+//        filterChain.doFilter(request, response);
     }
 }

@@ -18,7 +18,7 @@ public class CarDatabaseBeApplication implements CommandLineRunner {
 
 	private final CarRepository carRepository; // Dependency injection.
 	private final OwnerRepository ownerRepository; // Dependency injection.
-	private final UserRepository userRepository;
+	private final UserRepository userRepository; // Dependency injection.
 
 	public CarDatabaseBeApplication(OwnerRepository ownerRepository, CarRepository carRepository, UserRepository userRepository) {
 		this.ownerRepository = ownerRepository;

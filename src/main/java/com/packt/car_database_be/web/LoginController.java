@@ -34,7 +34,7 @@ public class LoginController {
 
         // Build response with generated JSON Web Token.
         return ResponseEntity.ok()
-                .header(HttpHeaders.AUTHORIZATION, "Bearer" + jwt)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, "Authorization")
                 .build();
     }

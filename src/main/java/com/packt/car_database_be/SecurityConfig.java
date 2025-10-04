@@ -22,16 +22,53 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
+    // Application-specific service that implements UserDetailsService.
+    // Fetches users from the userRepository and returns UserDetails for Spring Security.
     private final UserService userService;
+
+    // Custom filter that reads JWT from Authorization header and sets Authentication.
     private final AuthenticationFilter authenticationFilter;
 
+    // Constructor dependency injection.
     public SecurityConfig(UserService userService, AuthenticationFilter authenticationFilter) {
         this.userService = userService;
         this.authenticationFilter = authenticationFilter;
     }
 
+    // Attempts to configure the AuthenticationManagerBuilder to use the userService and a BCrypt password encoder.
     public void configureGlobal(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-            authenticationManagerBuilder.userDetailsService(userService).passwordEncoder(new BCryptPasswordEncoder());
+            authenticationManagerBuilder
+                    .userDetailsService(userService) // Tells Spring Security to use userService to load users.
+                    .passwordEncoder(new BCryptPasswordEncoder()); // Tells Spring Security that passwords are BCrypt-hashed.
+    }
+
+    // Exposes PasswordEncoder as a bean.
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    // Exposes AuthenticationManager from AuthenticationConfiguration as a bean.
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    // Builds and returns a SecurityFilterChain bean that describes HTTP security rules.
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.csrf((csrf) -> csrf.disable()) // Disables CSRF for a stateless REST API, typical for JWT.
+                .sessionManagement((sessionManagement) -> sessionManagement
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // No HTTP session.
+                .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
+                        .requestMatchers(HttpMethod.POST, "/login")
+                        .permitAll() // Allows POST /login without authentication.
+                        .anyRequest()
+                        .authenticated()) // Everything else requires authentication.
+                // Adds JWT-authentication before UsernamePasswordAuthenticationFilter so that JWT validation on non-login routes happens early in the chain.
+                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return httpSecurity.build();
     }
 
 //    @Bean
@@ -44,29 +81,4 @@ public class SecurityConfig {
 //
 //        return new InMemoryUserDetailsManager(user);
 //    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf((csrf) -> csrf.disable())
-                .sessionManagement((sessionManagement) -> sessionManagement
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-                        .requestMatchers(HttpMethod.POST, "/login")
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated())
-                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return httpSecurity.build();
-    }
 }
