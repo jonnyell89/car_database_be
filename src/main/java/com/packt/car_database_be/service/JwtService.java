@@ -3,8 +3,6 @@ package com.packt.car_database_be.service;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -33,7 +31,7 @@ public class JwtService {
                 .compact();
     }
 
-    // Verifies and decodes the JSON Web Token.
+    // Validates a signed JSON Web Token and extracts the username from the payload.
     public String getAuthorisedUser(String token) {
         return Jwts.parserBuilder() // Creates a new JWT parser.
                 .setSigningKey(key) // Provides the key to verify the signature.
@@ -42,19 +40,4 @@ public class JwtService {
                 .getBody() // Retrieves the JWT payload.
                 .getSubject(); // Extracts the username from the payload.
     }
-
-//    Get JSON Web Token from request Authorization header, verify, get username.
-//    public String getAuthorisedUser(HttpServletRequest httpServletRequest) {
-//        String token = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
-//
-//        if (token != null) {
-//            return Jwts.parserBuilder()
-//                    .setSigningKey(key)
-//                    .build()
-//                    .parseClaimsJws(token.replace(PREFIX, ""))
-//                    .getBody()
-//                    .getSubject();
-//        }
-//        return null;
-//    }
 }

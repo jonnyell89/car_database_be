@@ -14,39 +14,36 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.util.Collections;
 
-@Component
-public class AuthenticationFilter extends OncePerRequestFilter {
+// Intercepts HTTP requests before they reach the controllers and responds to their JSON Web Tokens.
+@Component // Marks the class as a Spring-managed component; can be injected using constructor injection.
+public class AuthenticationFilter extends OncePerRequestFilter { // Guarantees the filter executes once per HTTP request.
 
+    // Dependency injection. Validates and parses JSON Web Tokens from HTTP requests.
     private final JwtService jwtService;
 
+    // When creating an AuthenticationFilter object, Spring injects an instance of the JwtService.
     public AuthenticationFilter(JwtService jwtService) {
         this.jwtService = jwtService;
     }
 
+    // Is applied to every incoming HTTP request.
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, java.io.IOException {
-        // Get JSON Web Token from Authorization header.
+        // Get JSON Web Token from the HTTP request Authorization header.
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (header != null && header.startsWith("Bearer ")) {
-            String token = header.substring(7);
-            String user = jwtService.getAuthorisedUser(token);
+            String token = header.substring(7); // Extracts the JWT substring from the header string.
+            String username = jwtService.getAuthorisedUser(token); // Returns the username embedded in the subject of the JWT.
 
-            if (user != null) {
-                Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+            if (username != null) {
+                // Creates an Authentication object.
+                Authentication authentication = new UsernamePasswordAuthenticationToken(username, null, Collections.emptyList());
+                // Provides Spring Security with the identity of the authenticated user.
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
+        // Passes the request to the next filter in the chain, or the controller itself.
         filterChain.doFilter(request, response);
-
-//        if (jwt != null) {
-//            // Verify JSON Web Token and get user.
-//            String user = jwtService.getAuthorisedUser(request);
-//            // Authenticate
-//            Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, java.util.Collections.emptyList());
-//
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//        }
-//        filterChain.doFilter(request, response);
     }
 }
