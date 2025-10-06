@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-// Bridge between application database and Spring Security authentication system.
+// Connects application database with Spring Security authentication system.
 @Service
 public class UserService implements UserDetailsService {
 

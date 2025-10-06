@@ -10,25 +10,40 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 
-@Component
+// Centre of the authentication mechanism; creates, signs and verifies JSON Web Tokens.
+@Component // Marks the class as a Spring-managed component; can be injected using constructor injection.
 public class JwtService {
 
-    static final long EXPIRATION_TIME = 86400000;
-    static final String PREFIX = "Bearer";
+    static final long EXPIRATION_TIME = 86400000; // 24 hours in milliseconds.
+    // static final String PREFIX = "Bearer"; // Authorization: Bearer <JWT>
 
-    // Only for demonstration purposes. In production, read it from the application configuration.
-    static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    // Only for demonstration purposes. In production, read from application.properties or environment variables.
+    static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256); // Creates a secret key for signing the JWT.
 
-    // Generate signed JSON Web Token.
+    // Generates a signed JSON Web Token when user login is successful.
     public String getToken(String username) {
         return Jwts.builder()
+                // The subject is the main piece of identifying information stored in the JWT.
                 .setSubject(username)
+                // Sets the expiration data of the JWT.
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                // Signs the JWT with the key.
                 .signWith(key)
+                // Finalises and returns the JTW as a compact string: <HEADER>.<PAYLOAD>.<SIGNATURE>
                 .compact();
     }
 
-    // Get JSON Web Token from request Authorization header, verify, get username.
+    // Verifies and decodes the JSON Web Token.
+    public String getAuthorisedUser(String token) {
+        return Jwts.parserBuilder() // Creates a new JWT parser.
+                .setSigningKey(key) // Provides the key to verify the signature.
+                .build() // Finalises the parser configuration.
+                .parseClaimsJws(token) // Parses and verifies the JWT.
+                .getBody() // Retrieves the JWT payload.
+                .getSubject(); // Extracts the username from the payload.
+    }
+
+//    Get JSON Web Token from request Authorization header, verify, get username.
 //    public String getAuthorisedUser(HttpServletRequest httpServletRequest) {
 //        String token = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
 //
@@ -42,13 +57,4 @@ public class JwtService {
 //        }
 //        return null;
 //    }
-
-    public String getAuthorisedUser(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
 }
