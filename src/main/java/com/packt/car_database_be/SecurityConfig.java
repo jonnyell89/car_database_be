@@ -19,23 +19,26 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // Application-specific service that implements UserDetailsService.
     // Fetches users from the userRepository and returns UserDetails for Spring Security.
     private final UserDetailsServiceImplementation userDetailsServiceImplementation;
 
     // Custom filter that reads JWT from Authorization header and sets Authentication.
     private final AuthenticationFilter authenticationFilter;
 
+    // Intercepts unauthorised HTTP requests and gives a controlled and consistent response.
+    private final AuthenticationEntryPointImplementation exceptionHandler;
+
     // Constructor dependency injection.
-    public SecurityConfig(UserDetailsServiceImplementation userDetailsServiceImplementation, AuthenticationFilter authenticationFilter) {
+    public SecurityConfig(UserDetailsServiceImplementation userDetailsServiceImplementation, AuthenticationFilter authenticationFilter, AuthenticationEntryPointImplementation exceptionHandler) {
         this.userDetailsServiceImplementation = userDetailsServiceImplementation;
         this.authenticationFilter = authenticationFilter;
+        this.exceptionHandler = exceptionHandler;
     }
 
-    // Attempts to configure the AuthenticationManagerBuilder to use the userService and a BCrypt password encoder.
+    // Attempts to configure the AuthenticationManagerBuilder to use the userDetailsServiceImplementation and a BCrypt password encoder.
     public void configureGlobal(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
             authenticationManagerBuilder
-                    .userDetailsService(userDetailsServiceImplementation) // Tells Spring Security to use userService to load users.
+                    .userDetailsService(userDetailsServiceImplementation) // Tells Spring Security to use userDetailsServiceImplementation to load users.
                     .passwordEncoder(new BCryptPasswordEncoder()); // Tells Spring Security that passwords are BCrypt-hashed.
     }
 
@@ -68,7 +71,9 @@ public class SecurityConfig {
                         .anyRequest()
                         .authenticated())
                 // Adds custom JWT-authentication filter before UsernamePasswordAuthenticationFilter so that JWT validation on non-login routes happens before Spring's default filter.
-                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                // Registers custom entry point for exception handling.
+                .exceptionHandling((exceptionHandling) -> exceptionHandling.authenticationEntryPoint(exceptionHandler));
 
         // Finalises configuration and builds the SecurityFilterChain object.
         return httpSecurity.build();

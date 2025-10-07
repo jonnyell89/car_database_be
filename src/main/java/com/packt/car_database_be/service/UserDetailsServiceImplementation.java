@@ -17,7 +17,7 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     // Dependency injection. Must be initialised through the constructor.
     private final UserRepository userRepository;
 
-    // When creating a UserService object, Spring injects an instance of the UserRepository.
+    // When creating a UserDetailsServiceImplementation object, Spring injects an instance of the UserRepository.
     public UserDetailsServiceImplementation(UserRepository userRepository) {
         this.userRepository = userRepository;
     }

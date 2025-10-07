@@ -1,0 +1,30 @@
+package com.packt.car_database_be;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+// Called when access is unauthorised or JWT is invalid.
+public class AuthenticationEntryPointImplementation implements AuthenticationEntryPoint {
+
+    // Called when an AuthenticationException occurs.
+    @Override
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authenticationException)
+            throws IOException, ServletException {
+
+        // Sets the HTTP response status code to 401 Unauthorized.
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        // Sets the HTTP response type to application/json.
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        // Allows a message to be written in the HTTP response body.
+        PrintWriter printWriter = response.getWriter();
+        // The message containing the relevant information.
+        printWriter.println("Error: " + authenticationException.getMessage());
+    }
+}
