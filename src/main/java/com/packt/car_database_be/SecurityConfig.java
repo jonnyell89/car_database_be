@@ -1,6 +1,6 @@
 package com.packt.car_database_be;
 
-import com.packt.car_database_be.service.UserService;
+import com.packt.car_database_be.service.UserDetailsServiceImplementation;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,11 +11,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -24,21 +21,21 @@ public class SecurityConfig {
 
     // Application-specific service that implements UserDetailsService.
     // Fetches users from the userRepository and returns UserDetails for Spring Security.
-    private final UserService userService;
+    private final UserDetailsServiceImplementation userDetailsServiceImplementation;
 
     // Custom filter that reads JWT from Authorization header and sets Authentication.
     private final AuthenticationFilter authenticationFilter;
 
     // Constructor dependency injection.
-    public SecurityConfig(UserService userService, AuthenticationFilter authenticationFilter) {
-        this.userService = userService;
+    public SecurityConfig(UserDetailsServiceImplementation userDetailsServiceImplementation, AuthenticationFilter authenticationFilter) {
+        this.userDetailsServiceImplementation = userDetailsServiceImplementation;
         this.authenticationFilter = authenticationFilter;
     }
 
     // Attempts to configure the AuthenticationManagerBuilder to use the userService and a BCrypt password encoder.
     public void configureGlobal(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
             authenticationManagerBuilder
-                    .userDetailsService(userService) // Tells Spring Security to use userService to load users.
+                    .userDetailsService(userDetailsServiceImplementation) // Tells Spring Security to use userService to load users.
                     .passwordEncoder(new BCryptPasswordEncoder()); // Tells Spring Security that passwords are BCrypt-hashed.
     }
 
@@ -54,20 +51,26 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    // Builds and returns a SecurityFilterChain bean that describes HTTP security rules.
+    // Builds and returns a SecurityFilterChain bean that defines all security rules for incoming HTTP requests.
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf((csrf) -> csrf.disable()) // Disables CSRF for a stateless REST API, typical for JWT.
+        // Disables CSRF for a stateless REST API, typical for JWT.
+        httpSecurity.csrf((csrf) -> csrf.disable())
+                // No HTTP session in stateless JWT-based APIs.
                 .sessionManagement((sessionManagement) -> sessionManagement
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // No HTTP session.
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // This section defines permissions.
                 .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
+                        // Allows POST /login without authentication, necessary for JWT assignment.
                         .requestMatchers(HttpMethod.POST, "/login")
-                        .permitAll() // Allows POST /login without authentication.
+                        .permitAll()
+                        // All other endpoints require authentication.
                         .anyRequest()
-                        .authenticated()) // Everything else requires authentication.
-                // Adds JWT-authentication before UsernamePasswordAuthenticationFilter so that JWT validation on non-login routes happens early in the chain.
+                        .authenticated())
+                // Adds custom JWT-authentication filter before UsernamePasswordAuthenticationFilter so that JWT validation on non-login routes happens before Spring's default filter.
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
+        // Finalises configuration and builds the SecurityFilterChain object.
         return httpSecurity.build();
     }
 

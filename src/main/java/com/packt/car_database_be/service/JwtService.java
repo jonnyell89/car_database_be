@@ -13,7 +13,6 @@ import java.util.Date;
 public class JwtService {
 
     static final long EXPIRATION_TIME = 86400000; // 24 hours in milliseconds.
-    // static final String PREFIX = "Bearer"; // Authorization: Bearer <JWT>
 
     // Only for demonstration purposes. In production, read from application.properties or environment variables.
     static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256); // Creates a secret key for signing the JWT.
@@ -33,11 +32,17 @@ public class JwtService {
 
     // Validates a signed JSON Web Token and extracts the username from the payload.
     public String getAuthorisedUser(String token) {
-        return Jwts.parserBuilder() // Creates a new JWT parser.
-                .setSigningKey(key) // Provides the key to verify the signature.
-                .build() // Finalises the parser configuration.
-                .parseClaimsJws(token) // Parses and verifies the JWT.
-                .getBody() // Retrieves the JWT payload.
-                .getSubject(); // Extracts the username from the payload.
+        // Creates a new JWT parser.
+        return Jwts.parserBuilder()
+                // Provides the key to verify the signature.
+                .setSigningKey(key)
+                // Finalises the parser configuration.
+                .build()
+                // Parses and verifies the JWT.
+                .parseClaimsJws(token)
+                // Retrieves the JWT payload.
+                .getBody()
+                // Extracts the username from the payload.
+                .getSubject();
     }
 }

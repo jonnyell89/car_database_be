@@ -33,8 +33,10 @@ public class AuthenticationFilter extends OncePerRequestFilter { // Guarantees t
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
         if (header != null && header.startsWith("Bearer ")) {
-            String token = header.substring(7); // Extracts the JWT substring from the header string.
-            String username = jwtService.getAuthorisedUser(token); // Returns the username embedded in the subject of the JWT.
+            // Extracts the JWT substring from the header string.
+            String token = header.substring(7);
+            // Returns the username embedded in the subject of the JWT.
+            String username = jwtService.getAuthorisedUser(token);
 
             if (username != null) {
                 // Creates an Authentication object.

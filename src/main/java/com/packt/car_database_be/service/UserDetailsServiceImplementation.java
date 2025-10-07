@@ -12,13 +12,13 @@ import java.util.Optional;
 
 // Connects application database with Spring Security authentication system.
 @Service
-public class UserService implements UserDetailsService {
+public class UserDetailsServiceImplementation implements UserDetailsService {
 
     // Dependency injection. Must be initialised through the constructor.
     private final UserRepository userRepository;
 
     // When creating a UserService object, Spring injects an instance of the UserRepository.
-    public UserService(UserRepository userRepository) {
+    public UserDetailsServiceImplementation(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
