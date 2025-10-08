@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -14,6 +15,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -59,6 +65,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         // Disables CSRF for a stateless REST API, typical for JWT.
         httpSecurity.csrf((csrf) -> csrf.disable())
+                // Enables Spring Security's CORS support.
+                .cors(Customizer.withDefaults())
                 // No HTTP session in stateless JWT-based APIs.
                 .sessionManagement((sessionManagement) -> sessionManagement
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -77,6 +85,30 @@ public class SecurityConfig {
 
         // Finalises configuration and builds the SecurityFilterChain object.
         return httpSecurity.build();
+    }
+
+    // Defines the Spring bean that provides the CORS configuration used by securityFilterChain.
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        // Maps URL patterns to specific CORS rules.
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // To be populated with allowed origins, methods and headers.
+        CorsConfiguration config = new CorsConfiguration();
+        // Allows all origins to access the API. For development purposes; not suitable for production.
+        config.setAllowedOrigins(Arrays.asList("*")); // config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://<frontend-domain>.com"));
+        // Allows all HTTP methods. For development purposes; not suitable for production.
+        config.setAllowedMethods(Arrays.asList("*")); // config.setAllowedMethods(Arrays.asList("GET", "POST"));
+        // Allows all headers. Necessary if frontend sends JWT in the Authorization header.
+        config.setAllowedHeaders(Arrays.asList("*"));
+        // Specifies whether the browser can send cookies or authentication headers with cross-origin requests.
+        config.setAllowCredentials(false); // Safer and typical for token-based APIs.
+        // Adds Spring's default safe CORS settings. Redundant with "*" permissions.
+        config.applyPermitDefaultValues();
+
+        // Applies the above CORS configuration to all endpoints.
+        source.registerCorsConfiguration("/**", config);
+        // Returns CORS configuration to Spring Security to be used by securityFilterChain.
+        return source;
     }
 
 //    @Bean
