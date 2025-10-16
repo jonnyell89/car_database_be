@@ -1,6 +1,6 @@
 package com.packt.car_database_be;
 
-import com.packt.car_database_be.web.CarController;
+import com.packt.car_database_be.web.LoginController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,10 +11,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CarDatabaseBeApplicationTests {
 
 	@Autowired
-	private CarController carController;
+	private LoginController loginController;
 
 	@Test
 	void contextLoads() {
-		assertThat(carController).isNotNull();
+		assertThat(loginController).isNotNull();
 	}
 }

@@ -18,12 +18,12 @@ public class CarDatabaseBeApplication implements CommandLineRunner {
 
 	private final CarRepository carRepository; // Dependency injection.
 	private final OwnerRepository ownerRepository; // Dependency injection.
-	private final UserRepository userRepository; // Dependency injection.
+	private final AppUserRepository appUserRepository; // Dependency injection.
 
-	public CarDatabaseBeApplication(OwnerRepository ownerRepository, CarRepository carRepository, UserRepository userRepository) {
+	public CarDatabaseBeApplication(OwnerRepository ownerRepository, CarRepository carRepository, AppUserRepository appUserRepository) {
 		this.ownerRepository = ownerRepository;
 		this.carRepository = carRepository;
-		this.userRepository = userRepository;
+		this.appUserRepository = appUserRepository;
 	}
 
 	public static void main(String[] args) {
@@ -46,9 +46,9 @@ public class CarDatabaseBeApplication implements CommandLineRunner {
 		}
 
 		// Username: admin, password: admin
-		userRepository.save(new User("admin", "$2a$12$Y5zNvfgv3s5Maw3HMIRDK.HzBgu6r15v0N5NWoB3s9xD08iOFQPA2", "ADMIN"));
+		appUserRepository.save(new AppUser("admin", "$2a$12$Y5zNvfgv3s5Maw3HMIRDK.HzBgu6r15v0N5NWoB3s9xD08iOFQPA2", "ADMIN"));
 
 		// Username: user, password: user
-		userRepository.save(new User("user", "$2a$12$3euH0ZIyCuQAUx.872c.I.P5x8RcMm2iMwHxz3W5ZK9JNR7TEdGi2", "USER"));
+		appUserRepository.save(new AppUser("user", "$2a$12$3euH0ZIyCuQAUx.872c.I.P5x8RcMm2iMwHxz3W5ZK9JNR7TEdGi2", "USER"));
 	}
 }

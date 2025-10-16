@@ -3,7 +3,7 @@ package com.packt.car_database_be.domain;
 import jakarta.persistence.*;
 
 @Entity
-public class User {
+public class AppUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -19,9 +19,9 @@ public class User {
     @Column(nullable = false)
     private String role;
 
-    public User() {};
+    public AppUser() {};
 
-    public User(String username, String password, String role) {
+    public AppUser(String username, String password, String role) {
         super();
         this.username = username;
         this.password = password;

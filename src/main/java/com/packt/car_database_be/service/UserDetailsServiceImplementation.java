@@ -1,7 +1,7 @@
 package com.packt.car_database_be.service;
 
-import com.packt.car_database_be.domain.User;
-import com.packt.car_database_be.domain.UserRepository;
+import com.packt.car_database_be.domain.AppUser;
+import com.packt.car_database_be.domain.AppUserRepository;
 import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,11 +15,11 @@ import java.util.Optional;
 public class UserDetailsServiceImplementation implements UserDetailsService {
 
     // Dependency injection. Must be initialised through the constructor.
-    private final UserRepository userRepository;
+    private final AppUserRepository appUserRepository;
 
     // When creating a UserDetailsServiceImplementation object, Spring injects an instance of the UserRepository.
-    public UserDetailsServiceImplementation(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserDetailsServiceImplementation(AppUserRepository appUserRepository) {
+        this.appUserRepository = appUserRepository;
     }
 
     // Called with login attempt or with JWT verification.
@@ -27,20 +27,20 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         // Optional prevents error if user is not found in userRepository.
-        Optional<User> user = userRepository.findByUsername(username);
+        Optional<AppUser> user = appUserRepository.findByUsername(username);
 
         // Prepares a UserBuilder object, which is used to create a UserDetails object.
         UserBuilder builder = null;
         // Optional requires .isPresent() check.
         if (user.isPresent()) {
             // Retrieves the User from the Optional.
-            User currentUser = user.get();
+            AppUser currentAppUser = user.get();
             // Starts constructing a UserDetails object.
             builder = org.springframework.security.core.userdetails.User.withUsername(username);
             // Adds the encoded password to compare with the password entered during login.
-            builder.password(currentUser.getPassword());
+            builder.password(currentAppUser.getPassword());
             // Adds the user's role
-            builder.roles(currentUser.getRole());
+            builder.roles(currentAppUser.getRole());
         } else {
             throw new UsernameNotFoundException("User not found in userRepository.");
         }
