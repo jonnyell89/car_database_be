@@ -9,10 +9,6 @@ public class MessageService {
 
     public MessageService() {};
 
-    public List<String> getMessages() {
-        return messages;
-    }
-
     public String getMessage(int index) {
         if (index > messages.size()) throw new IndexOutOfBoundsException();
         return messages.get(index);
